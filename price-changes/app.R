@@ -60,6 +60,18 @@ ui <- fluidPage(
     value = 2008
   ),
 
+  selectizeInput(
+    "components_filter",
+    label = "",
+    choices = sort(unique(cpi_components$`CPI component`)),
+    selected = c(
+      "Food", "Clothing", "Actual rents for housing", "Financial services n.e.c.",
+      "Electricity, gas and other fuels", "Insurance", "Personal care",
+      "Transport services", "Water supply and misc. services for the dwelling"
+    ),
+    multiple = TRUE
+  ),
+
   ggiraph::girafeOutput("inflationPlot")
 )
 
@@ -84,7 +96,8 @@ server <- function(input, output) {
     cpi_components_change <-
       cpi_components_change |>
 
-      filter(`CPI component` != "Cpi index 00: all items") |>
+      # filter(`CPI component` != "Cpi index 00: all items") |>
+      filter(`CPI component` %in% input$components_filter) |>
 
       # Fetch the most recent % change value for each CPI component: this will be used to colour the lines in the plot along a red or blue gradient
       group_by(`CPI component`) |>
