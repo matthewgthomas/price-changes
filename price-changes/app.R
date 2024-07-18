@@ -46,33 +46,53 @@ cpi_components <-
 
 # ---- UI ----
 ui <- fluidPage(
-  titlePanel("Price changes in the UK"),
+  titlePanel("Explore price changes in the UK"),
 
-  h2("Explore price changes in the UK"),
+  fluidRow(
+    column(
+      12,
 
-  sliderInput(
-    "from_year",
-    label = str_glue("Pick a year between {min(cpi_components$Year)} and {max(cpi_components$Year)}"),
-    min = min(cpi_components$Year),
-    max = max(cpi_components$Year),
-    step = 1,
-    sep = "",
-    value = 2008
+      p("Track how prices have changed for consumer goods and services in the UK. Choose a year from which to measure the percentage change, based on the consumer price index (CPI) published by the", a("Office for National Statistics", hred = "https://www.ons.gov.uk/economy/inflationandpriceindices", target = "_blank")),
+
+      sliderInput(
+        "from_year",
+        label = str_glue("Pick a year between {min(cpi_components$Year)} and {max(cpi_components$Year)}"),
+        min = min(cpi_components$Year),
+        max = max(cpi_components$Year),
+        step = 1,
+        sep = "",
+        value = 2008,
+        width = "50%"
+      )
+    )
   ),
 
-  selectizeInput(
-    "components_filter",
-    label = "",
-    choices = sort(unique(cpi_components$`CPI component`)),
-    selected = c(
-      "Food", "Clothing", "Actual rents for housing", "Financial services n.e.c.",
-      "Electricity, gas and other fuels", "Insurance", "Personal care",
-      "Transport services", "Water supply and misc. services for the dwelling"
-    ),
-    multiple = TRUE
+  fluidRow(
+    column(
+      12,
+
+      selectizeInput(
+        "components_filter",
+        label = "Choose consumer goods and services to see in the graph",
+        choices = sort(unique(cpi_components$`CPI component`)),
+        selected = c(
+          "Food", "Clothing", "Actual rents for housing", "Financial services n.e.c.",
+          "Electricity, gas and other fuels", "Insurance", "Personal care",
+          "Transport services", "Water supply and misc. services for the dwelling"
+        ),
+        multiple = TRUE,
+        width = "90%"
+      )
+    )
   ),
 
-  ggiraph::girafeOutput("inflationPlot")
+  fluidRow(
+    column(
+      12,
+
+     girafeOutput("inflationPlot", width = "70%")
+    )
+  )
 )
 
 # ---- Server ----
@@ -82,6 +102,7 @@ server <- function(input, output) {
     cpi_components_change <-
       cpi_components |>
       filter(Year >= input$from_year) |>
+      #filter(Year == 2024) |>
 
       group_by(`CPI component`) |>
       mutate(pct_change = (pct_change - first(pct_change)) / first(pct_change)) |>
