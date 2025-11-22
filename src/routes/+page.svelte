@@ -46,13 +46,15 @@
   let rawData: RawRow[] = [];
   let availableComponents: string[] = [];
   let selectedList: string[] = [];
-  let fromMonth = '2008-01';
-  let fromDate = new Date(2008, 0, 1);
-  let effectiveFromDate = fromDate;
+  let selectedYear = 2008;
+  let selectedMonth = '01';
+  let requestedDate = new Date(2008, 0, 1);
+  let effectiveFromDate = requestedDate;
   let minDate: Date | null = null;
   let maxDate: Date | null = null;
-  let minMonth = '1988-01';
-  let maxMonth = '';
+  let minYear = 1988;
+  let maxYear = 1988;
+  let yearOptions: number[] = [];
   let loading = true;
   let error = '';
 
@@ -70,13 +72,25 @@
   const clampDate = (date: Date, min: Date, max: Date) =>
     new Date(Math.min(Math.max(date.getTime(), min.getTime()), max.getTime()));
 
-  const monthKey = (date: Date) =>
-    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-
-  const parseMonth = (value: string) => {
-    const [y, m] = value.split('-').map(Number);
-    return new Date(y || 1988, (m || 1) - 1, 1);
+  const buildMonthDate = (year: number, month: string) => {
+    const m = Number(month) || 1;
+    return new Date(year || 1988, Math.min(Math.max(m, 1), 12) - 1, 1);
   };
+
+  const monthOptions = [
+    { value: '01', label: 'January' },
+    { value: '02', label: 'February' },
+    { value: '03', label: 'March' },
+    { value: '04', label: 'April' },
+    { value: '05', label: 'May' },
+    { value: '06', label: 'June' },
+    { value: '07', label: 'July' },
+    { value: '08', label: 'August' },
+    { value: '09', label: 'September' },
+    { value: '10', label: 'October' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'December' }
+  ];
 
   onMount(async () => {
     try {
@@ -98,17 +112,15 @@
       minDate = min(dates) ?? null;
       maxDate = max(dates) ?? null;
 
-      if (minDate) {
-        minMonth = monthKey(minDate);
-      }
-      if (maxDate) {
-        maxMonth = monthKey(maxDate);
-      }
-
       if (minDate && maxDate) {
+        minYear = minDate.getFullYear();
+        maxYear = maxDate.getFullYear();
+        yearOptions = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
+
         const initial = new Date(2008, 0, 1);
         const clamped = clampDate(initial, minDate, maxDate);
-        fromMonth = monthKey(clamped);
+        selectedYear = clamped.getFullYear();
+        selectedMonth = String(clamped.getMonth() + 1).padStart(2, '0');
       }
 
       availableComponents = Array.from(new Set(rawData.map((d) => d.component))).sort((a, b) =>
@@ -181,9 +193,9 @@
     return series;
   };
 
-  $: fromDate = parseMonth(fromMonth);
+  $: requestedDate = buildMonthDate(selectedYear, selectedMonth);
   $: effectiveFromDate =
-    minDate && maxDate ? clampDate(fromDate, minDate, maxDate) : fromDate;
+    minDate && maxDate ? clampDate(requestedDate, minDate, maxDate) : requestedDate;
 
   $: filtered = rawData.filter((row) => row.date >= effectiveFromDate);
   $: seriesMap = buildSeries(filtered);
@@ -214,6 +226,8 @@
   $: fromLabel = monthFormatter(effectiveFromDate);
   $: startPeriod = filtered.length ? dateFormatter(filtered[0].date) : '';
   $: endPeriod = filtered.length ? dateFormatter(filtered[filtered.length - 1].date) : '';
+  $: showMonthYearTicks =
+    !!(maxDate && effectiveFromDate >= new Date(maxDate.getFullYear() - 3, maxDate.getMonth(), maxDate.getDate()));
 
   const setSelection = (names: string[]) => {
     selectedList = names.filter((name) => availableComponents.includes(name));
@@ -252,7 +266,7 @@
     <h1>Explore price changes in the UK</h1>
     <p>
       Track how prices have shifted for consumer goods and services using the consumer price index (CPI).
-      Pick a starting year, choose the components you care about, and hover the chart to see detailed
+      Pick a starting month, choose the components you care about, and hover the chart to see detailed
       movements.
     </p>
     <p>
@@ -270,16 +284,34 @@
           <label for="from-month">Starting month</label>
           <strong>{fromLabel}</strong>
         </div>
-        <input
-          class="range-input"
-          id="from-month"
-          type="month"
-          min={minMonth}
-          max={maxMonth}
-          bind:value={fromMonth}
-          aria-label="Pick a month and year to compare price changes"
-        />
-        <p>Choose any month between {minLabel} and {maxLabel}.</p>
+        <div class="picker-row">
+          <select
+            id="from-month"
+            class="month-select"
+            bind:value={selectedMonth}
+            aria-label="Pick a month to compare price changes"
+          >
+            {#each monthOptions as option}
+              <option value={option.value}>{option.label}</option>
+            {/each}
+          </select>
+          <input
+            id="from-year"
+            class="year-input"
+            type="number"
+            min={minYear}
+            max={maxYear}
+            list="year-options"
+            bind:value={selectedYear}
+            aria-label="Pick a year (1988 or later) to compare price changes"
+          />
+          <datalist id="year-options">
+            {#each yearOptions as year}
+              <option value={year}></option>
+            {/each}
+          </datalist>
+        </div>
+        <p>Choose any month between {minLabel} and {maxLabel}. You can type a year or pick from the list.</p>
       </div>
 
       <div class="control-card">
@@ -343,7 +375,9 @@
                 {#each xTicks as tick}
                   <g transform={`translate(${xScale(tick)}, ${viewHeight - margin.bottom})`}>
                     <line y2="8" stroke="#cbd5e1" />
-                    <text y="24" text-anchor="middle">{timeFormat('%Y')(tick)}</text>
+                    <text y="24" text-anchor="middle">
+                      {showMonthYearTicks ? timeFormat('%b %Y')(tick) : timeFormat('%Y')(tick)}
+                    </text>
                   </g>
                 {/each}
                 <line

@@ -62,6 +62,28 @@ section {
   width: 100%;
 }
 
+.picker-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.month-select,
+.year-input {
+  padding: 0.55rem 0.6rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.month-select {
+  flex: 1 1 160px;
+}
+
+.year-input {
+  flex: 1 1 120px;
+}
+
 .multi-select {
   width: 100%;
   min-height: 220px;
