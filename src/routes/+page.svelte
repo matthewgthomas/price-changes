@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { base } from '$app/paths';
   import { csvParse } from 'd3-dsv';
   import { extent, max, min } from 'd3-array';
   import { scaleLinear, scaleTime } from 'd3-scale';
@@ -94,7 +95,7 @@
 
   onMount(async () => {
     try {
-      const response = await fetch('/data/cpi_components.csv');
+      const response = await fetch(`${base}/data/cpi_components.csv`);
       const text = await response.text();
       const parsed = csvParse(text, (d) => {
         if (!d.Date || !d['CPI component'] || !d.pct_change) return null;

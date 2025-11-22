@@ -12,7 +12,7 @@ const config = {
       $data: 'static/data'
     },
     paths: {
-      base: process.env.BASE_PATH ?? ''
+      base: process.env.NODE_ENV === 'production' ? '/price-changes' : '',
     }
   }
 };
