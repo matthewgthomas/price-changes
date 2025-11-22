@@ -45,6 +45,5 @@ cpi_components <-
   mutate(`CPI component` = str_to_sentence(`CPI component`))
 
 # ---- Save to CSV in the repo ----
-# adjust path if you like (e.g. "data/cpi_components.csv")
-dir.create("price-changes/data", showWarnings = FALSE)
-write_csv(cpi_components, "price-changes/data/cpi_components.csv")
+dir.create("static/data", showWarnings = FALSE, recursive = TRUE)
+write_csv(cpi_components, "static/data/cpi_components.csv")
