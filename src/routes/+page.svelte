@@ -25,6 +25,7 @@
 
   const formatter = numberFormat('.1%');
   const dateFormatter = timeFormat('%d %B %Y');
+  const monthFormatter = timeFormat('%B %Y');
 
   const defaultSelections = [
     'Food',
@@ -45,9 +46,13 @@
   let rawData: RawRow[] = [];
   let availableComponents: string[] = [];
   let selectedList: string[] = [];
-  let fromYear = 2008;
-  let minYear = 0;
-  let maxYear = 0;
+  let fromMonth = '2008-01';
+  let fromDate = new Date(2008, 0, 1);
+  let effectiveFromDate = fromDate;
+  let minDate: Date | null = null;
+  let maxDate: Date | null = null;
+  let minMonth = '1988-01';
+  let maxMonth = '';
   let loading = true;
   let error = '';
 
@@ -61,6 +66,17 @@
         y: number;
       }
     | null = null;
+
+  const clampDate = (date: Date, min: Date, max: Date) =>
+    new Date(Math.min(Math.max(date.getTime(), min.getTime()), max.getTime()));
+
+  const monthKey = (date: Date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+  const parseMonth = (value: string) => {
+    const [y, m] = value.split('-').map(Number);
+    return new Date(y || 1988, (m || 1) - 1, 1);
+  };
 
   onMount(async () => {
     try {
@@ -78,10 +94,22 @@
       }).filter(Boolean) as RawRow[];
 
       rawData = parsed.sort((a, b) => a.date.getTime() - b.date.getTime());
-      const years = rawData.map((d) => d.year);
-      minYear = min(years) ?? 0;
-      maxYear = max(years) ?? 0;
-      fromYear = Math.max(fromYear, minYear);
+      const dates = rawData.map((d) => d.date);
+      minDate = min(dates) ?? null;
+      maxDate = max(dates) ?? null;
+
+      if (minDate) {
+        minMonth = monthKey(minDate);
+      }
+      if (maxDate) {
+        maxMonth = monthKey(maxDate);
+      }
+
+      if (minDate && maxDate) {
+        const initial = new Date(2008, 0, 1);
+        const clamped = clampDate(initial, minDate, maxDate);
+        fromMonth = monthKey(clamped);
+      }
 
       availableComponents = Array.from(new Set(rawData.map((d) => d.component))).sort((a, b) =>
         a.localeCompare(b)
@@ -153,7 +181,11 @@
     return series;
   };
 
-  $: filtered = rawData.filter((row) => row.year >= fromYear);
+  $: fromDate = parseMonth(fromMonth);
+  $: effectiveFromDate =
+    minDate && maxDate ? clampDate(fromDate, minDate, maxDate) : fromDate;
+
+  $: filtered = rawData.filter((row) => row.date >= effectiveFromDate);
   $: seriesMap = buildSeries(filtered);
   $: selectedSeries = selectedList
     .map((name) => seriesMap.get(name))
@@ -177,6 +209,9 @@
   $: xTicks = xScale.ticks(6);
   $: yTicks = yScale.ticks(6);
 
+  $: minLabel = minDate ? monthFormatter(minDate) : '';
+  $: maxLabel = maxDate ? monthFormatter(maxDate) : '';
+  $: fromLabel = monthFormatter(effectiveFromDate);
   $: startPeriod = filtered.length ? dateFormatter(filtered[0].date) : '';
   $: endPeriod = filtered.length ? dateFormatter(filtered[filtered.length - 1].date) : '';
 
@@ -232,20 +267,19 @@
     <div class="controls">
       <div class="control-card">
         <div class="label-row">
-          <label for="from-year">Starting year</label>
-          <strong>{fromYear}</strong>
+          <label for="from-month">Starting month</label>
+          <strong>{fromLabel}</strong>
         </div>
         <input
           class="range-input"
-          id="from-year"
-          type="range"
-          min={minYear}
-          max={maxYear}
-          step="1"
-          bind:value={fromYear}
-          aria-label="Pick a year to compare price changes"
+          id="from-month"
+          type="month"
+          min={minMonth}
+          max={maxMonth}
+          bind:value={fromMonth}
+          aria-label="Pick a month and year to compare price changes"
         />
-        <p>Choose any year between {minYear} and {maxYear}.</p>
+        <p>Choose any month between {minLabel} and {maxLabel}.</p>
       </div>
 
       <div class="control-card">
@@ -289,7 +323,7 @@
         <div class="card">
           <h3>Overall inflation</h3>
           <p>
-            {headlineSeries ? formatter(headlineSeries.latest) : 'Not available'} since {fromYear}
+            {headlineSeries ? formatter(headlineSeries.latest) : 'Not available'} since {fromLabel}
           </p>
         </div>
         <div class="card">
@@ -299,7 +333,7 @@
       </div>
 
       <div class="chart-wrapper">
-        <h2>Price changes from {fromYear} through {endPeriod}</h2>
+        <h2>Price changes from {fromLabel} through {endPeriod}</h2>
         {#if !selectedSeries.length}
           <p>Pick one or more CPI components to view the chart.</p>
         {:else}
@@ -390,7 +424,7 @@
               <strong>{hover.component}</strong><br />
               {dateFormatter(hover.date)}<br />
               {hover.change >= 0 ? 'Prices increased by ' : 'Prices fell by '}{formatter(Math.abs(hover.change))}
-              since {fromYear}
+              since {fromLabel}
             </div>
           {/if}
         {/if}
