@@ -262,11 +262,10 @@
 
 <main>
   <header>
-    <p>Office for National Statistics</p>
     <h1>Explore price changes in the UK</h1>
     <p>
       Track how prices have shifted for consumer goods and services using the consumer price index (CPI).
-      Pick a starting month, choose the components you care about, and hover the chart to see detailed
+      Pick a starting month and year, choose the components you care about, and hover the chart to see detailed
       movements.
     </p>
     <p>
