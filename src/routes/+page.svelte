@@ -161,16 +161,18 @@
   $: headlineSeries = seriesMap.get('Cpi index 00: all items');
   $: dates = filtered.map((d) => d.date);
   $: xDomain = dates.length ? extent(dates) : [new Date(), new Date()];
+  $: xDomainKey = xDomain.map((d) => d.getTime()).join('-');
   $: yValues = selectedSeries.flatMap((s) => s.points.map((p) => p.change));
   $: yDomain = yValues.length ? extent([...yValues, 0, headlineSeries?.latest ?? 0]) : [-0.1, 0.1];
 
   $: xScale = scaleTime(xDomain as [Date, Date], [margin.left, viewWidth - margin.right]);
   $: yScale = scaleLinear(yDomain as [number, number], [viewHeight - margin.bottom, margin.top]);
 
-  const lineGenerator = shapeLine<ChartPoint>()
-    .x((d) => xScale(d.date))
-    .y((d) => yScale(d.change))
-    .curve(curveMonotoneX);
+  const buildPath = (points: ChartPoint[], scaleX: typeof xScale, scaleY: typeof yScale) =>
+    shapeLine<ChartPoint>()
+      .x((d) => scaleX(d.date))
+      .y((d) => scaleY(d.change))
+      .curve(curveMonotoneX)(points) ?? '';
 
   $: xTicks = xScale.ticks(6);
   $: yTicks = yScale.ticks(6);
@@ -301,85 +303,87 @@
         {#if !selectedSeries.length}
           <p>Pick one or more CPI components to view the chart.</p>
         {:else}
-          <svg viewBox={`0 0 ${viewWidth} ${viewHeight}`} role="img" aria-label="Price change chart">
-            <g class="axis">
-              {#each xTicks as tick}
-                <g transform={`translate(${xScale(tick)}, ${viewHeight - margin.bottom})`}>
-                  <line y2="8" stroke="#cbd5e1" />
-                  <text y="24" text-anchor="middle">{timeFormat('%Y')(tick)}</text>
-                </g>
-              {/each}
-              <line
-                x1={margin.left}
-                x2={viewWidth - margin.right}
-                y1={viewHeight - margin.bottom}
-                y2={viewHeight - margin.bottom}
-                stroke="#cbd5e1"
-              />
-
-              {#each yTicks as tick}
-                <g transform={`translate(0, ${yScale(tick)})`}>
-                  <line x1={margin.left - 6} x2={viewWidth - margin.right} stroke="#e2e8f0" />
-                  <text x={margin.left - 10} text-anchor="end" alignment-baseline="middle">
-                    {formatter(tick)}
-                  </text>
-                </g>
-              {/each}
-            </g>
-
-            <line
-              x1={margin.left}
-              x2={viewWidth - margin.right}
-              y1={yScale(0)}
-              y2={yScale(0)}
-              stroke="#94a3b8"
-              stroke-dasharray="4 6"
-              stroke-width="1.2"
-            />
-
-            {#if headlineSeries}
-              <line
-                x1={margin.left}
-                x2={viewWidth - margin.right}
-                y1={yScale(headlineSeries.latest)}
-                y2={yScale(headlineSeries.latest)}
-                stroke="#0f172a"
-                stroke-dasharray="6 6"
-                stroke-width="1.4"
-              />
-              <text
-                x={viewWidth - margin.right}
-                y={yScale(headlineSeries.latest) - 8}
-                text-anchor="end"
-                fill="#0f172a"
-                font-weight="600"
-              >
-                Overall inflation {formatter(headlineSeries.latest)}
-              </text>
-            {/if}
-
-            {#each selectedSeries as series (series.name)}
-              <path
-                d={lineGenerator(series.points) ?? ''}
-                fill="none"
-                stroke={series.color}
-                stroke-width="2"
-                stroke-linecap="round"
-                opacity="0.92"
-              />
-
-              {#each series.points as point (point.date.toISOString() + series.name)}
-                <circle
-                  cx={xScale(point.date)}
-                  cy={yScale(point.change)}
-                  r={3.3}
-                  fill={series.color}
-                  on:mouseenter={(event) => handleHover(event, point, series.color)}
-                  on:mouseleave={() => (hover = null)}
+          {#key xDomainKey}
+            <svg viewBox={`0 0 ${viewWidth} ${viewHeight}`} role="img" aria-label="Price change chart">
+              <g class="axis">
+                {#each xTicks as tick}
+                  <g transform={`translate(${xScale(tick)}, ${viewHeight - margin.bottom})`}>
+                    <line y2="8" stroke="#cbd5e1" />
+                    <text y="24" text-anchor="middle">{timeFormat('%Y')(tick)}</text>
+                  </g>
+                {/each}
+                <line
+                  x1={margin.left}
+                  x2={viewWidth - margin.right}
+                  y1={viewHeight - margin.bottom}
+                  y2={viewHeight - margin.bottom}
+                  stroke="#cbd5e1"
                 />
+
+                {#each yTicks as tick}
+                  <g transform={`translate(0, ${yScale(tick)})`}>
+                    <line x1={margin.left - 6} x2={viewWidth - margin.right} stroke="#e2e8f0" />
+                    <text x={margin.left - 10} text-anchor="end" alignment-baseline="middle">
+                      {formatter(tick)}
+                    </text>
+                  </g>
+                {/each}
+              </g>
+
+              <line
+                x1={margin.left}
+                x2={viewWidth - margin.right}
+                y1={yScale(0)}
+                y2={yScale(0)}
+                stroke="#94a3b8"
+                stroke-dasharray="4 6"
+                stroke-width="1.2"
+              />
+
+              {#if headlineSeries}
+                <line
+                  x1={margin.left}
+                  x2={viewWidth - margin.right}
+                  y1={yScale(headlineSeries.latest)}
+                  y2={yScale(headlineSeries.latest)}
+                  stroke="#0f172a"
+                  stroke-dasharray="6 6"
+                  stroke-width="1.4"
+                />
+                <text
+                  x={viewWidth - margin.right}
+                  y={yScale(headlineSeries.latest) - 8}
+                  text-anchor="end"
+                  fill="#0f172a"
+                  font-weight="600"
+                >
+                  Overall inflation {formatter(headlineSeries.latest)}
+                </text>
+              {/if}
+
+              {#each selectedSeries as series (series.name)}
+                <path
+                  d={buildPath(series.points, xScale, yScale)}
+                  fill="none"
+                  stroke={series.color}
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  opacity="0.92"
+                />
+
+                {#each series.points as point (point.date.toISOString() + series.name)}
+                  <circle
+                    cx={xScale(point.date)}
+                    cy={yScale(point.change)}
+                    r={3.3}
+                    fill={series.color}
+                    on:mouseenter={(event) => handleHover(event, point, series.color)}
+                    on:mouseleave={() => (hover = null)}
+                  />
+                {/each}
               {/each}
-            {/each}
-          </svg>
+            </svg>
+          {/key}
 
           {#if hover}
             <div class="tooltip" style={`left:${hover.x}px; top:${hover.y}px;`}>
