@@ -1,3 +1,5 @@
+install.packages(c("readr", "dplyr", "tidyr", "stringr", "lubridate"))
+
 library(readr)
 library(dplyr)
 library(tidyr)
