@@ -1,0 +1,225 @@
+:root {
+  color-scheme: light;
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  background: #f4f6fb;
+  color: #0f172a;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at 10% 20%, rgba(67, 56, 202, 0.08), transparent 25%),
+    radial-gradient(circle at 90% 10%, rgba(236, 72, 153, 0.08), transparent 25%),
+    #f8fafc;
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 3rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 2.5vw, 2.8rem);
+}
+
+p {
+  line-height: 1.6;
+  margin: 0.3rem 0;
+}
+
+section {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  padding: 1.75rem;
+  margin-top: 1.5rem;
+}
+
+.controls {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.control-card {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e2e8f0;
+}
+
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.range-input {
+  width: 100%;
+}
+
+.picker-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.month-select,
+.year-input {
+  padding: 0.55rem 0.6rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.month-select {
+  flex: 1 1 160px;
+}
+
+.year-input {
+  flex: 1 1 120px;
+}
+
+.multi-select {
+  width: 100%;
+  min-height: 220px;
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  font-size: 0.95rem;
+}
+
+.multi-select option {
+  padding: 0.3rem 0.4rem;
+}
+
+.button-row {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+button {
+  border: none;
+  background: #4338ca;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+button.secondary {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(67, 56, 202, 0.18);
+}
+
+.summary-row {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-top: 1.5rem;
+}
+
+.card {
+  background: #111827;
+  color: white;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.card p {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: #e2e8f0;
+}
+
+.chart-wrapper {
+  margin-top: 1.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+  padding: 1.25rem;
+  position: relative;
+}
+
+svg {
+  width: 100%;
+  height: auto;
+}
+
+.axis text {
+  fill: #475569;
+  font-size: 12px;
+}
+
+.axis line,
+.axis path {
+  stroke: #cbd5e1;
+}
+
+.tooltip {
+  position: absolute;
+  background: rgba(15, 23, 42, 0.96);
+  color: white;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  pointer-events: none;
+  transform: translate(-50%, -120%);
+  min-width: 210px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  line-height: 1.4;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: white;
+  padding: 0.35rem 0.55rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 720px) {
+  .multi-select {
+    min-height: 160px;
+  }
+
+  .tooltip {
+    transform: translate(-50%, -105%);
+  }
+}

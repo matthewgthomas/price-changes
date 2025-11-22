@@ -1,0 +1,52 @@
+name: Update CPI data and deploy
+
+on:
+  schedule:
+    # Third Wednesday of each month (days 15–21 where day-of-week is Wednesday)
+    - cron: "0 3 15-21 * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  # Set this if the site is served from a subpath (e.g., GitHub Pages at /price-changes)
+  BASE_PATH: /price-changes
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Run CPI update script
+        run: Rscript scripts/update-cpi.R
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+        env:
+          BASE_PATH: ${{ env.BASE_PATH }}
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          publish_branch: gh-pages
+          user_name: github-actions[bot]
+          user_email: 41898282+github-actions[bot]@users.noreply.github.com
