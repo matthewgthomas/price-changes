@@ -18,14 +18,22 @@ cpi_raw <-
 # Fetch CPI index components and subcomponents names
 component_names <- sort(grep(pattern = "CPI INDEX \\d{2}\\.\\d{1,2} ", names(cpi_raw), value = TRUE))
 
+# Matches strings of the form "{Year} {Abbreviated month name}", e.g. "1988 JAN" and "2004 AUG"
+year_month_regex <- paste("[0-9]{4}", paste(toupper(month.abb), collapse = "|"), sep = " ")
+
 cpi_components <-
   cpi_raw |>
   select(Date, `CPI INDEX 00: ALL ITEMS 2015=100`, all_of(component_names)) |>
 
-  # Keep quarterly data from Q1 1988 onwards
-  filter(str_detect(Date, "[0-9]{4} Q\\d{1}")) |>
-  mutate(Date = yq(Date)) |>
-  filter(Date >= yq("1988 Q1")) |>
+  # OLD: Keep quarterly data from Q1 1988 onwards
+  # filter(str_detect(Date, "[0-9]{4} Q\\d{1}")) |>
+  # mutate(Date = yq(Date)) |>
+  # filter(Date >= yq("1988 Q1")) |>
+
+  # Keep monthly data from Jan 1988 onwards (first date the CPI components are available)
+  filter(str_detect(Date, year_month_regex)) |>
+  mutate(Date = ym(Date)) |>
+  filter(Date >= ym("1988-01")) |>
 
   mutate(across(where(is.character), as.numeric)) |>
 
