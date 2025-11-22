@@ -3,7 +3,7 @@ name: Update CPI data and deploy
 on:
   schedule:
     # Third Wednesday of each month (days 15–21 where day-of-week is Wednesday)
-    - cron: "0 3 15-21 * 3"
+    - cron: "0 11 15-21 * 3"
   workflow_dispatch:
 
 permissions:
