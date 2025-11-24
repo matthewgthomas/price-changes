@@ -161,6 +161,13 @@ button:hover {
   position: relative;
 }
 
+.narrative {
+  margin: 0.35rem 0 0.85rem;
+  color: #334155;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
 svg {
   width: 100%;
   height: auto;

@@ -229,6 +229,66 @@
   $: endPeriod = filtered.length ? dateFormatter(filtered[filtered.length - 1].date) : '';
   $: showMonthYearTicks =
     !!(maxDate && effectiveFromDate >= new Date(maxDate.getFullYear() - 3, maxDate.getMonth(), maxDate.getDate()));
+  const describeChange = (value: number) => {
+    if (value === 0) return 'flat';
+    const direction = value > 0 ? 'up' : 'down';
+    return `${direction} ${formatter(Math.abs(value))}`;
+  };
+  $: summaryText = (() => {
+    if (loading || error) return '';
+    if (!selectedSeries.length) return '';
+
+    const total = selectedSeries.length;
+    const spanLabel = endPeriod ? `${fromLabel} to ${endPeriod}` : `since ${fromLabel}`;
+
+    if (total === 1) {
+      const series = selectedSeries[0];
+      const parts: string[] = [];
+
+      parts.push(`${series.name} is ${describeChange(series.latest)} from ${spanLabel}.`);
+
+      if (headlineSeries) {
+        const relative =
+          series.latest === headlineSeries.latest
+            ? 'matching'
+            : series.latest > headlineSeries.latest
+              ? 'with prices rising slower than'
+              : 'running hotter than';
+        parts.push(
+          `Overall inflation is ${describeChange(headlineSeries.latest)} over the same span, ${relative} this component.`
+        );
+      }
+
+      return parts.join(' ');
+    }
+
+    const gains = selectedSeries.filter((s) => s.latest > 0);
+    const losses = selectedSeries.filter((s) => s.latest < 0);
+    const flat = total - gains.length - losses.length;
+    const parts: string[] = [];
+
+    parts.push(
+      `From ${spanLabel}, ${gains.length} of ${total} selected components are higher${losses.length ? `, ${losses.length} lower` : ''}${flat ? `, ${flat} flat` : ''}.`
+    );
+
+    const topMover = [...selectedSeries].sort((a, b) => Math.abs(b.latest) - Math.abs(a.latest))[0];
+    const topGainer = gains.sort((a, b) => b.latest - a.latest)[0];
+    const topLoser = losses.sort((a, b) => a.latest - b.latest)[0];
+
+    if (topGainer && topLoser) {
+      parts.push(
+        `${topGainer.name} leads the gains (${describeChange(topGainer.latest)}), while ${topLoser.name} has moved ${describeChange(topLoser.latest)}.`
+      );
+    } else if (topMover) {
+      parts.push(`${topMover.name} is the biggest mover, ${describeChange(topMover.latest)}.`);
+    }
+
+    if (headlineSeries) {
+      parts.push(`Overall inflation is ${describeChange(headlineSeries.latest)} over the same span.`);
+    }
+
+    return parts.join(' ');
+  })();
 
   const setSelection = (names: string[]) => {
     selectedList = names.filter((name) => availableComponents.includes(name));
@@ -366,6 +426,9 @@
 
       <div class="chart-wrapper">
         <h2>Price changes from {fromLabel} through {endPeriod}</h2>
+        {#if summaryText}
+          <p class="narrative">{summaryText}</p>
+        {/if}
         {#if !selectedSeries.length}
           <p>Pick one or more CPI components to view the chart.</p>
         {:else}
