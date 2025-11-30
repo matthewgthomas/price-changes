@@ -268,7 +268,7 @@
     const parts: string[] = [];
 
     parts.push(
-      `From ${spanLabel}, ${gains.length} of ${total} selected components are higher${losses.length ? `, ${losses.length} lower` : ''}${flat ? `, ${flat} flat` : ''}.`
+      `From ${spanLabel}, ${gains.length} of ${total} selected components have become more expensive${losses.length ? `, with ${losses.length} getting cheaper` : ''}${flat ? `, ${flat} flat` : ''}.`
     );
 
     const topMover = [...selectedSeries].sort((a, b) => Math.abs(b.latest) - Math.abs(a.latest))[0];
@@ -277,10 +277,10 @@
 
     if (topGainer && topLoser) {
       parts.push(
-        `${topGainer.name} leads the gains (${describeChange(topGainer.latest)}), while ${topLoser.name} has moved ${describeChange(topLoser.latest)}.`
+        `The cost of '${topGainer.name}' has risen fastest (${describeChange(topGainer.latest)}), while '${topLoser.name}' is ${describeChange(topLoser.latest)}.`
       );
     } else if (topMover) {
-      parts.push(`${topMover.name} is the biggest mover, ${describeChange(topMover.latest)}.`);
+      parts.push(`The cost of '${topMover.name}' has increased the most, ${describeChange(topMover.latest)}.`);
     }
 
     if (headlineSeries) {
