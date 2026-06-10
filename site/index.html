@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Price of Everything — UK inflation explorer</title>
+  <meta name="description" content="Explore nearly four decades of UK consumer price inflation: drill down from overall CPI to individual items like bread, rents and rail fares, from any start date.">
+  <meta property="og:title" content="The Price of Everything — UK inflation explorer">
+  <meta property="og:description" content="Drill into the UK's Consumer Price Index, from all items down to pasta and package holidays.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>£</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap masthead-grid">
+    <div class="masthead-title">
+      <p class="kicker">UK Consumer Price Index · monthly data since 1988</p>
+      <h1>The Price of <em>Everything</em></h1>
+      <p class="standfirst">
+        Drill down from headline inflation to the price of bread, rents and package
+        holidays. Pick any start date, compare anything with overall CPI, and let the
+        numbers tell their own story.
+      </p>
+    </div>
+    <div class="masthead-stats" id="headline-stats" aria-live="polite">
+      <!-- headline stat cards injected here -->
+    </div>
+  </div>
+</header>
+
+<section class="now-section">
+  <div class="wrap">
+    <h2 class="section-title" id="now-title">Inflation right now</h2>
+    <p class="section-sub" id="now-sub"></p>
+    <div id="overview-chart" class="overview-chart" role="img" aria-label="Annual inflation rate by CPI division for the latest month"></div>
+    <p class="hint">Tap a bar to add that category to the chart below.</p>
+  </div>
+</section>
+
+<main class="explorer wrap" id="explorer">
+  <aside class="sidebar">
+    <details class="tree-panel" id="tree-panel" open>
+      <summary>
+        <span class="panel-title">Choose what to track</span>
+        <span class="selected-count" id="selected-count"></span>
+      </summary>
+      <div class="tree-tools">
+        <input type="search" id="tree-search" placeholder="Search 371 categories — try “butter”"
+               aria-label="Search CPI categories" autocomplete="off">
+        <button type="button" class="ghost-btn" id="clear-selection">Clear</button>
+      </div>
+      <div class="tree" id="tree" role="tree" aria-label="CPI component hierarchy"></div>
+    </details>
+  </aside>
+
+  <section class="main-panel">
+    <div class="controls">
+      <div class="control metric-control" role="radiogroup" aria-label="Measure">
+        <button type="button" class="seg" data-metric="annual">Annual change</button>
+        <button type="button" class="seg" data-metric="since">Change since start</button>
+        <button type="button" class="seg" data-metric="index">Index level</button>
+      </div>
+
+      <div class="control date-control">
+        <label for="start-month">From</label>
+        <select id="start-month" aria-label="Start month"></select>
+        <select id="start-year" aria-label="Start year"></select>
+      </div>
+
+      <label class="control check-control">
+        <input type="checkbox" id="compare-cpi" checked>
+        <span>Compare with overall&nbsp;CPI</span>
+      </label>
+
+      <label class="control check-control">
+        <input type="checkbox" id="show-events" checked>
+        <span>Event markers</span>
+      </label>
+    </div>
+
+    <div class="legend" id="legend"></div>
+    <p class="metric-explainer" id="metric-explainer"></p>
+
+    <div class="chart-wrap">
+      <div id="chart" class="chart"></div>
+      <div id="tooltip" class="tooltip" hidden></div>
+    </div>
+
+    <section class="story" id="story" aria-live="polite">
+      <h2 class="section-title story-title">The story in these numbers</h2>
+      <div id="story-body" class="story-body"></div>
+      <p class="story-note">Written automatically from the data shown above — no AI, just arithmetic.</p>
+    </section>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <p>
+      Data: <a id="source-link" href="https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/consumerpriceindices" target="_blank" rel="noopener">Consumer price inflation tables (MM23)</a>,
+      Office for National Statistics, used under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank" rel="noopener">Open Government Licence v3.0</a>.
+      <span id="release-info"></span>
+    </p>
+    <p>
+      Annual rates are calculated from published index values and may differ from ONS
+      headline rates by ±0.1 percentage points. Some detailed series begin later than 1988.
+    </p>
+    <p>Made with <a href="https://github.com/matthewgthomas/price-changes" target="_blank" rel="noopener">open code</a>. Charts update automatically when ONS publishes new figures.</p>
+  </div>
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
