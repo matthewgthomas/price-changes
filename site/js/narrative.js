@@ -93,11 +93,11 @@ function vsCpiPhrase(st, cpi) {
   if (st.startedLate) cpi = statsFor("00", st.baseIdx) || cpi;
   const diff = st.total - cpi.total;
   if (st.total < -2 && cpi.total > 2) return ` — getting cheaper even as prices in general rose ${pct(cpi.total, 0)}`;
-  if (diff > Math.max(8, cpi.total)) return ` — far outpacing overall CPI (${signedPct(cpi.total, 0)})`;
-  if (diff > 5) return `, ahead of overall CPI (${signedPct(cpi.total, 0)})`;
-  if (diff < -Math.max(8, cpi.total * 0.5)) return ` — well behind overall CPI (${signedPct(cpi.total, 0)})`;
-  if (diff < -5) return `, lagging overall CPI (${signedPct(cpi.total, 0)})`;
-  return `, broadly tracking overall CPI (${signedPct(cpi.total, 0)})`;
+  if (diff > Math.max(8, cpi.total)) return ` — far outpacing overall CPIH (${signedPct(cpi.total, 0)})`;
+  if (diff > 5) return `, ahead of overall CPIH (${signedPct(cpi.total, 0)})`;
+  if (diff < -Math.max(8, cpi.total * 0.5)) return ` — well behind overall CPIH (${signedPct(cpi.total, 0)})`;
+  if (diff < -5) return `, lagging overall CPIH (${signedPct(cpi.total, 0)})`;
+  return `, broadly tracking overall CPIH (${signedPct(cpi.total, 0)})`;
 }
 
 function directionPhrase(st) {
@@ -155,7 +155,7 @@ export function renderStory(el) {
         ? (cpi.latestAnnual > cpi.prevAnnual + 0.05 ? "up from" :
            cpi.latestAnnual < cpi.prevAnnual - 0.05 ? "down from" : "unchanged from")
         : "";
-      lede += ` Headline CPI inflation is <strong>${pct(cpi.latestAnnual)}</strong>` +
+      lede += ` Headline CPIH inflation is <strong>${pct(cpi.latestAnnual)}</strong>` +
         (dir && dir !== "unchanged from"
           ? `, ${dir} ${pct(cpi.prevAnnual)} the month before.`
           : dir ? `, the same as the month before.` : ".");

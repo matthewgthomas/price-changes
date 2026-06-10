@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Price of Everything — UK inflation explorer</title>
-  <meta name="description" content="Explore nearly four decades of UK consumer price inflation: drill down from overall CPI to individual items like bread, rents and rail fares, from any start date.">
+  <meta name="description" content="Explore nearly four decades of UK consumer price inflation: drill down from overall inflation (CPIH) to individual items like bread, rents and rail fares, from any start date.">
   <meta property="og:title" content="The Price of Everything — UK inflation explorer">
-  <meta property="og:description" content="Drill into the UK's Consumer Price Index, from all items down to pasta and package holidays.">
+  <meta property="og:description" content="Drill into the UK's consumer price statistics (CPIH), from all items down to pasta and package holidays.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,11 +19,11 @@
 <header class="masthead">
   <div class="wrap masthead-grid">
     <div class="masthead-title">
-      <p class="kicker">UK Consumer Price Index · monthly data since 1988</p>
+      <p class="kicker">UK consumer prices (CPIH) · monthly data since 1988</p>
       <h1>The Price of <em>Everything</em></h1>
       <p class="standfirst">
         Drill down from headline inflation to the price of bread, rents and package
-        holidays. Pick any start date, compare anything with overall CPI, and let the
+        holidays. Pick any start date, compare anything with overall CPIH, and let the
         numbers tell their own story.
       </p>
     </div>
@@ -37,7 +37,7 @@
   <div class="wrap">
     <h2 class="section-title" id="now-title">Inflation right now</h2>
     <p class="section-sub" id="now-sub"></p>
-    <div id="overview-chart" class="overview-chart" role="img" aria-label="Annual inflation rate by CPI division for the latest month"></div>
+    <div id="overview-chart" class="overview-chart" role="img" aria-label="Annual inflation rate by CPIH division for the latest month"></div>
     <p class="hint">Tap a bar to add that category to the chart below.</p>
   </div>
 </section>
@@ -51,10 +51,10 @@
       </summary>
       <div class="tree-tools">
         <input type="search" id="tree-search" placeholder="Search 371 categories — try “butter”"
-               aria-label="Search CPI categories" autocomplete="off">
+               aria-label="Search CPIH categories" autocomplete="off">
         <button type="button" class="ghost-btn" id="clear-selection">Clear</button>
       </div>
-      <div class="tree" id="tree" role="tree" aria-label="CPI component hierarchy"></div>
+      <div class="tree" id="tree" role="tree" aria-label="CPIH component hierarchy"></div>
     </details>
   </aside>
 
@@ -74,7 +74,7 @@
 
       <label class="control check-control">
         <input type="checkbox" id="compare-cpi" checked>
-        <span>Compare with overall&nbsp;CPI</span>
+        <span>Compare with overall&nbsp;CPIH</span>
       </label>
 
       <label class="control check-control">
@@ -107,6 +107,8 @@
       <span id="release-info"></span>
     </p>
     <p>
+      CPIH is the Consumer Prices Index including owner occupiers' housing costs —
+      the ONS's lead measure of consumer price inflation.
       Annual rates are calculated from published index values and may differ from ONS
       headline rates by ±0.1 percentage points. Some detailed series begin later than 1988.
     </p>

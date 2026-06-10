@@ -116,7 +116,7 @@ function buildHeadlineStats() {
     </div>`;
 
   $("#headline-stats").innerHTML =
-    card("CPI inflation", fmtMonth(dates[lastIdx]),
+    card("CPIH inflation", fmtMonth(dates[lastIdx]),
       latest != null ? `${latest.toFixed(1)}%` : "–",
       deltaHtml(latest, prev, "on last month") + " " + deltaHtml(latest, yearAgo, "on last year")) +
     card("Rising fastest", hottest.name,
@@ -192,7 +192,7 @@ function renderLegend() {
     chips.push(`
       <span class="legend-chip cpi-chip">
         <span class="swatch dashed"></span>
-        <span class="chip-name">Overall CPI</span>
+        <span class="chip-name">Overall CPIH</span>
       </span>`);
   }
   legend.innerHTML = chips.length

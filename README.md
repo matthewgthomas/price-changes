@@ -2,21 +2,24 @@
 
 An interactive explorer for UK consumer price inflation, built on the ONS
 [consumer price inflation tables (MM23)](https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/consumerpriceindices).
+It uses **CPIH** — the Consumer Prices Index including owner occupiers' housing
+costs, the ONS's lead measure of inflation.
 
 **Live site:** https://matthewgthomas.github.io/price-changes/
 
 ## What it does
 
-- **Drill into the full CPI hierarchy** — 371 series: overall CPI, 12 divisions,
-  40 groups, 71 classes and 192 subclasses (down to rice, butter and package
-  holidays), plus goods/services breakdowns and core-inflation aggregates.
+- **Drill into the full CPIH hierarchy** — 371 series: overall CPIH, 12 divisions,
+  41 groups (including owner occupiers' housing costs), 71 classes and 192
+  subclasses (down to rice, butter and package holidays), plus goods/services
+  breakdowns and core-inflation aggregates.
 - **Explore from any start month** since January 1988.
 - **Three views of every series**: year-on-year change, cumulative change since
   your chosen start date, and the raw index level (2015 = 100).
-- **Compare anything with overall CPI**, with notable events (Black Wednesday,
+- **Compare anything with overall CPIH**, with notable events (Black Wednesday,
   Covid lockdown, the 2022 energy shock…) marked on the chart.
 - **Robo-journalism**: a deterministic narrative — peaks, troughs, deflation
-  streaks, comparisons with headline CPI — rewritten on the fly from whatever
+  streaks, comparisons with headline CPIH — rewritten on the fly from whatever
   is currently selected. No AI involved, just arithmetic.
 - Shareable URLs (the whole view lives in the hash), responsive layout and
   automatic dark mode.
@@ -25,7 +28,7 @@ An interactive explorer for UK consumer price inflation, built on the ONS
 
 | Piece | What it does |
 |---|---|
-| [`scripts/prepare-cpi-data.R`](scripts/prepare-cpi-data.R) | Downloads MM23 from ONS, extracts every monthly `CPI INDEX … 2015=100` series, cleans names, derives the COICOP hierarchy and writes [`site/data/cpi.json`](site/data/cpi.json) |
+| [`scripts/prepare-cpi-data.R`](scripts/prepare-cpi-data.R) | Downloads MM23 from ONS, extracts every monthly `CPIH … 2015=100` index series, cleans names, derives the COICOP hierarchy and writes [`site/data/cpi.json`](site/data/cpi.json) |
 | [`site/`](site/) | The website — plain HTML/CSS/JS (ES modules) with [D3](https://d3js.org/), no build step |
 | [`.github/workflows/update-and-deploy.yml`](.github/workflows/update-and-deploy.yml) | Runs every Wednesday morning; when ONS has published new figures it commits the refreshed data and redeploys the site to GitHub Pages |
 

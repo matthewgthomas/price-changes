@@ -39,8 +39,8 @@ export function renderOverview() {
   const cpiRate = annualValues("00")[lastIdx];
 
   document.getElementById("now-sub").textContent =
-    `Annual price change in the 12 CPI divisions, year to ${fmtMonth(dates[lastIdx])}. ` +
-    `Overall CPI: ${cpiRate?.toFixed(1)}%.`;
+    `Annual price change in the 12 CPIH divisions, year to ${fmtMonth(dates[lastIdx])}. ` +
+    `Overall CPIH: ${cpiRate?.toFixed(1)}%.`;
 
   const narrow = width < 640;
   const rowH = narrow ? 30 : 32;
@@ -87,7 +87,7 @@ export function renderOverview() {
     .attr("font-size", narrow ? 11.5 : 13)
     .attr("font-weight", (d) => selected.has(d.id) ? 700 : 500)
     .attr("fill", ink)
-    .text((d) => truncate(d.name, narrow ? 22 : 38));
+    .text((d) => truncate(d.name, narrow ? 22 : 34));
 
   g.append("rect").attr("class", "fill")
     .attr("x", (d) => Math.min(x(0), x(d.rate)))
@@ -124,7 +124,7 @@ export function renderOverview() {
       .attr("text-anchor", "middle")
       .attr("font-size", 11).attr("font-weight", 600).attr("fill", ink)
       .attr("opacity", 0.75)
-      .text(`CPI ${cpiRate.toFixed(1)}%`);
+      .text(`CPIH ${cpiRate.toFixed(1)}%`);
   }
 
   container.replaceChildren(svg.node());

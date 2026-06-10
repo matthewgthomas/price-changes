@@ -106,7 +106,7 @@ export function renderChart() {
 
   const svg = d3.create("svg")
     .attr("viewBox", [0, 0, width, height])
-    .attr("aria-label", "Line chart of selected CPI series");
+    .attr("aria-label", "Line chart of selected CPIH series");
 
   // Grid + axes
   const yTicks = y.ticks(width < 560 ? 5 : 7);
